@@ -1,0 +1,1271 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>APAC Space Discovery · Workplace Intelligence</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Syne:wght@400;500;600;700&family=Syne+Mono&family=Lora:ital,wght@0,400;0,500;1,400&display=swap');
+
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+
+:root {
+  --bg: #f7f4ef;
+  --bg2: #ede9e0;
+  --ink: #1a1714;
+  --ink2: #3d3830;
+  --muted: #9c9488;
+  --muted2: #6b6358;
+  --border: #ddd8ce;
+  --border2: #c8c0b4;
+  --surface: #ffffff;
+  --accent: #1a4a6b;
+  --accent2: #2d6fa8;
+  --accent-soft: #eaf2f8;
+  --red: #8b2020;
+  --red-soft: #fdf0f0;
+  --green: #1a5c38;
+  --green-soft: #edf7f2;
+  --amber: #7a4f10;
+  --amber-soft: #fdf6ec;
+  --gold: #b8960a;
+
+  /* Region colors */
+  --sea: #2d7a5c;
+  --china: #c8441a;
+  --india: #8a5ab8;
+  --japan: #c8440a;
+  --korea: #1a5c8a;
+  --anz: #2d5a8a;
+}
+
+body {
+  font-family: 'Syne', sans-serif;
+  background: var(--bg);
+  color: var(--ink);
+  min-height: 100vh;
+  display: flex; flex-direction: column;
+}
+
+/* ── HEADER ── */
+.header {
+  background: var(--ink);
+  padding: 0 36px;
+  height: 58px;
+  display: flex; align-items: center; justify-content: space-between;
+  position: sticky; top:0; z-index:200;
+}
+
+.logo { display: flex; align-items: center; gap: 12px; }
+
+.logo-mark {
+  width: 32px; height: 32px;
+  background: var(--accent2);
+  border-radius: 5px;
+  display: flex; align-items: center; justify-content: center;
+  font-family: 'Arial', monospace;
+  font-size: 9px; color: white; letter-spacing: -0.02em;
+}
+
+.logo-text { font-size: 15px; font-weight: 600; color: white; letter-spacing: -0.01em; }
+.logo-sub { font-family: 'Syne Mono', monospace; font-size: 9px; color: rgba(255,255,255,0.35); letter-spacing: 0.08em; margin-top: 1px; }
+
+.header-center {
+  display: flex; align-items: center; gap: 6px;
+}
+
+.region-pill {
+  background: rgba(255,255,255,0.08);
+  border: 1px solid rgba(255,255,255,0.12);
+  border-radius: 20px;
+  padding: 4px 10px;
+  font-family: 'Syne Mono', monospace;
+  font-size: 9px; color: rgba(255,255,255,0.5);
+  letter-spacing: 0.06em;
+  transition: all 0.15s;
+  cursor: default;
+}
+
+.region-pill.active {
+  background: var(--accent2);
+  border-color: var(--accent2);
+  color: white;
+}
+
+.header-right {
+  display: flex; align-items: center; gap: 10px;
+}
+
+.mode-toggle {
+  display: flex;
+  background: rgba(255,255,255,0.08);
+  border-radius: 6px; padding: 3px; gap: 2px;
+}
+
+.mode-btn {
+  background: transparent; border: none;
+  padding: 5px 12px;
+  border-radius: 4px;
+  font-family: 'Syne', sans-serif;
+  font-size: 11px; color: rgba(255,255,255,0.45);
+  cursor: pointer; transition: all 0.15s;
+}
+
+.mode-btn.active { background: rgba(255,255,255,0.12); color: white; }
+
+/* ── LAYOUT ── */
+.app {
+  display: grid;
+  grid-template-columns: 460px 1fr;
+  flex: 1;
+  min-height: calc(100vh - 58px);
+}
+
+/* ── LEFT PANEL ── */
+.discovery-panel {
+  background: var(--surface);
+  border-right: 1px solid var(--border);
+  display: flex; flex-direction: column;
+  overflow-y: auto;
+  max-height: calc(100vh - 58px);
+}
+.discovery-panel::-webkit-scrollbar { width: 3px; }
+.discovery-panel::-webkit-scrollbar-thumb { background: var(--border2); border-radius:2px; }
+
+/* ── PROGRESS ── */
+.progress-header {
+  padding: 18px 26px 14px;
+  border-bottom: 1px solid var(--border);
+  position: sticky; top:0;
+  background: var(--surface); z-index:10;
+}
+
+.progress-top { display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px; }
+.progress-label { font-family: 'Syne Mono', monospace; font-size: 10px; color: var(--muted2); letter-spacing: 0.06em; }
+.progress-count { font-family: 'Syne Mono', monospace; font-size: 10px; color: var(--muted); }
+
+.progress-track { height: 2px; background: var(--border); border-radius: 1px; overflow: hidden; margin-bottom: 12px; }
+.progress-fill { height: 100%; background: var(--accent2); border-radius: 1px; transition: width 0.4s cubic-bezier(0.4,0,0.2,1); }
+
+.section-tabs { display: flex; gap: 0; overflow-x: auto; }
+.section-tab {
+  font-family: 'Syne Mono', monospace; font-size: 9px;
+  letter-spacing: 0.06em; text-transform: uppercase;
+  padding: 5px 10px; border: none; background: transparent;
+  color: var(--muted); cursor: pointer; white-space: nowrap;
+  border-bottom: 2px solid transparent; transition: all 0.15s;
+}
+.section-tab.active { color: var(--accent); border-bottom-color: var(--accent); }
+.section-tab.done { color: var(--green); }
+
+/* ── FORM ── */
+.form-body { padding: 0 26px 26px; flex: 1; }
+.form-section { display: none; animation: fadeUp 0.22s ease; }
+.form-section.active { display: block; }
+@keyframes fadeUp { from{opacity:0;transform:translateY(5px)} to{opacity:1;transform:translateY(0)} }
+
+.section-heading { padding: 18px 0 14px; border-bottom: 1px solid var(--border); margin-bottom: 18px; }
+.section-num { font-family: 'Syne Mono', monospace; font-size: 9px; color: var(--accent2); letter-spacing: 0.1em; text-transform: uppercase; margin-bottom: 3px; }
+.section-title { font-family: 'Lora', serif; font-size: 21px; letter-spacing: -0.02em; line-height: 1.2; }
+.section-desc { font-size: 12px; color: var(--muted2); margin-top: 4px; line-height: 1.5; }
+
+.field-group { margin-bottom: 16px; }
+.field-label {
+  font-family: 'Syne Mono', monospace; font-size: 10px; color: var(--ink2);
+  letter-spacing: 0.06em; text-transform: uppercase; margin-bottom: 6px;
+  display: flex; align-items: center; gap: 6px;
+}
+.field-hint { font-family: 'Syne', sans-serif; font-size: 10px; color: var(--muted); font-weight: 400; text-transform: none; letter-spacing: 0; }
+
+input[type="text"], input[type="number"], select, textarea {
+  width: 100%; background: var(--bg);
+  border: 1px solid var(--border2); border-radius: 6px;
+  padding: 9px 12px;
+  font-family: 'Syne', sans-serif; font-size: 13px; color: var(--ink);
+  outline: none; transition: border-color 0.15s, box-shadow 0.15s;
+  appearance: none;
+}
+input:focus, select:focus, textarea:focus {
+  border-color: var(--accent2);
+  box-shadow: 0 0 0 3px rgba(45,111,168,0.1);
+}
+select {
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'%3E%3Cpath d='M1 1l5 5 5-5' stroke='%239c9488' stroke-width='1.5' fill='none'/%3E%3C/svg%3E");
+  background-repeat: no-repeat; background-position: right 12px center;
+  padding-right: 32px; cursor: pointer;
+}
+textarea { resize: vertical; min-height: 64px; line-height: 1.5; }
+
+.input-row { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
+.input-row-3 { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 8px; }
+
+/* ── COUNTRY SELECTOR ── */
+.country-grid {
+  display: grid; grid-template-columns: repeat(3, 1fr); gap: 6px;
+}
+
+.country-card {
+  background: var(--bg);
+  border: 1px solid var(--border2);
+  border-radius: 7px; padding: 10px 10px 8px;
+  cursor: pointer; transition: all 0.15s;
+  text-align: center;
+}
+.country-card:hover { border-color: var(--accent2); }
+.country-card.selected { border-color: var(--accent2); background: var(--accent-soft); }
+
+.country-flag { font-size: 20px; margin-bottom: 3px; display: block; }
+.country-name { font-size: 11px; font-weight: 600; color: var(--ink2); margin-bottom: 1px; }
+.country-sub { font-family: 'Syne Mono', monospace; font-size: 9px; color: var(--muted); letter-spacing: 0.04em; }
+.country-card.selected .country-name { color: var(--accent); }
+
+/* ── SCALE SELECTOR ── */
+.scale-grid { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 8px; }
+
+.scale-card {
+  background: var(--bg); border: 1px solid var(--border2);
+  border-radius: 7px; padding: 12px 10px;
+  cursor: pointer; transition: all 0.15s; text-align: center;
+}
+.scale-card:hover { border-color: var(--accent2); }
+.scale-card.selected { background: var(--accent-soft); border-color: var(--accent2); }
+
+.scale-icon { font-size: 20px; margin-bottom: 6px; }
+.scale-label { font-size: 12px; font-weight: 600; color: var(--ink2); margin-bottom: 2px; }
+.scale-sub { font-family: 'Syne Mono', monospace; font-size: 9px; color: var(--muted); }
+.scale-card.selected .scale-label { color: var(--accent); }
+
+/* ── CAMPUS FIELDS (conditional) ── */
+.campus-fields {
+  background: var(--bg);
+  border: 1px solid var(--border);
+  border-radius: 8px; padding: 14px;
+  margin-top: 10px; display: none;
+}
+.campus-fields.visible { display: block; animation: fadeUp 0.2s ease; }
+.campus-note {
+  font-family: 'Syne Mono', monospace; font-size: 9px;
+  color: var(--accent2); letter-spacing: 0.06em;
+  text-transform: uppercase; margin-bottom: 10px;
+  display: flex; align-items: center; gap: 6px;
+}
+
+/* ── CHIPS ── */
+.chip-group { display: flex; flex-wrap: wrap; gap: 6px; }
+.chip-opt {
+  background: var(--bg); border: 1px solid var(--border2);
+  border-radius: 20px; padding: 5px 12px;
+  font-size: 12px; color: var(--ink2); cursor: pointer;
+  transition: all 0.15s; user-select: none;
+}
+.chip-opt:hover { border-color: var(--accent2); }
+.chip-opt.selected { background: var(--accent-soft); border-color: var(--accent2); color: var(--accent); font-weight: 600; }
+
+/* ── PAIN GRID ── */
+.pain-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 7px; }
+.pain-card {
+  background: var(--bg); border: 1px solid var(--border2);
+  border-radius: 7px; padding: 9px 11px;
+  cursor: pointer; transition: all 0.15s;
+  display: flex; align-items: flex-start; gap: 8px;
+}
+.pain-card:hover { border-color: var(--accent2); }
+.pain-card.selected { background: var(--accent-soft); border-color: var(--accent2); }
+.pain-icon { font-size: 14px; flex-shrink: 0; margin-top: 1px; }
+.pain-text { font-size: 11px; color: var(--ink2); line-height: 1.4; }
+.pain-card.selected .pain-text { color: var(--accent); }
+
+/* ── SLIDER ── */
+.slider-wrap { display: flex; align-items: center; gap: 10px; }
+input[type="range"] {
+  flex:1; appearance: none; height: 3px;
+  background: var(--border2); border-radius: 2px; outline: none; cursor: pointer;
+}
+input[type="range"]::-webkit-slider-thumb {
+  appearance: none; width: 16px; height: 16px;
+  border-radius: 50%; background: var(--accent2);
+  box-shadow: 0 1px 4px rgba(45,111,168,0.3); transition: transform 0.1s;
+}
+input[type="range"]::-webkit-slider-thumb:hover { transform: scale(1.2); }
+.slider-val { font-family: 'Syne Mono', monospace; font-size: 12px; color: var(--accent2); min-width: 44px; text-align: right; }
+
+/* ── BUDGET ── */
+.budget-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 7px; }
+.budget-card {
+  background: var(--bg); border: 1px solid var(--border2);
+  border-radius: 7px; padding: 11px 10px;
+  cursor: pointer; transition: all 0.15s; text-align: center;
+}
+.budget-card:hover { border-color: var(--accent2); }
+.budget-card.selected { background: var(--accent-soft); border-color: var(--accent2); }
+.budget-range { font-family: 'Lora', serif; font-size: 14px; letter-spacing: -0.01em; margin-bottom: 2px; }
+.budget-label { font-family: 'Syne Mono', monospace; font-size: 9px; color: var(--muted); }
+.budget-card.selected .budget-label { color: var(--accent); }
+
+/* ── CULTURE CARD (read-only insight) ── */
+.culture-insight {
+  background: var(--bg);
+  border: 1px solid var(--border);
+  border-left: 3px solid var(--accent2);
+  border-radius: 7px; padding: 12px 14px;
+  margin-top: 10px; display: none;
+}
+.culture-insight.visible { display: block; animation: fadeUp 0.2s ease; }
+.culture-title {
+  font-family: 'Syne Mono', monospace; font-size: 9px;
+  color: var(--accent2); letter-spacing: 0.08em; text-transform: uppercase; margin-bottom: 6px;
+}
+.culture-body { font-size: 12px; color: var(--ink2); line-height: 1.6; }
+.culture-tag {
+  display: inline-flex; align-items: center; gap: 4px;
+  background: rgba(45,111,168,0.08);
+  border: 1px solid rgba(45,111,168,0.2);
+  border-radius: 4px; padding: 2px 7px;
+  font-family: 'Syne Mono', monospace; font-size: 9px;
+  color: var(--accent2); margin: 3px 3px 3px 0;
+}
+
+/* ── NAV ── */
+.form-nav {
+  padding: 14px 26px; border-top: 1px solid var(--border);
+  display: flex; justify-content: space-between; align-items: center;
+  background: var(--surface); position: sticky; bottom: 0;
+}
+
+.btn { border: none; border-radius: 6px; padding: 9px 18px; font-family: 'Syne', sans-serif; font-size: 13px; font-weight: 600; cursor: pointer; transition: all 0.15s; }
+.btn-ghost { background: transparent; color: var(--muted2); border: 1px solid var(--border2); }
+.btn-ghost:hover { color: var(--ink); border-color: var(--border); }
+.btn-primary { background: var(--ink); color: white; }
+.btn-primary:hover { background: var(--accent); }
+.btn-generate { background: var(--accent2); color: white; }
+.btn-generate:hover { background: var(--accent); }
+
+.live-row { display: flex; align-items: center; gap: 6px; font-family: 'Syne Mono', monospace; font-size: 10px; color: var(--green); }
+.live-dot { width: 6px; height: 6px; border-radius: 50%; background: var(--green); animation: pulse 2s infinite; }
+@keyframes pulse { 0%,100%{opacity:1} 50%{opacity:0.3} }
+
+/* ── RIGHT PANEL ── */
+.output-panel {
+  padding: 28px 32px;
+  overflow-y: auto;
+  max-height: calc(100vh - 58px);
+  background: var(--bg);
+}
+.output-panel::-webkit-scrollbar { width: 3px; }
+.output-panel::-webkit-scrollbar-thumb { background: var(--border2); border-radius: 2px; }
+
+/* ── EMPTY STATE ── */
+.empty-state {
+  display: flex; flex-direction: column;
+  align-items: center; justify-content: center;
+  min-height: 420px; text-align: center; gap: 10px;
+}
+.empty-icon { font-size: 36px; opacity: 0.2; }
+.empty-title { font-family: 'Lora', serif; font-size: 20px; color: var(--muted2); letter-spacing: -0.01em; }
+.empty-sub { font-size: 12px; color: var(--muted); max-width: 240px; line-height: 1.5; }
+.empty-hint { background: var(--surface); border: 1px solid var(--border); border-radius: 6px; padding: 7px 14px; font-family: 'Syne Mono', monospace; font-size: 10px; color: var(--muted2); margin-top: 6px; }
+
+/* ── OUTPUT ── */
+.output-header { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 20px; }
+.output-title { font-family: 'Lora', serif; font-size: 24px; letter-spacing: -0.02em; line-height: 1.2; }
+.output-meta { font-family: 'Syne Mono', monospace; font-size: 10px; color: var(--muted); margin-top: 3px; }
+.output-actions { display: flex; gap: 7px; }
+.action-btn { background: var(--surface); border: 1px solid var(--border2); border-radius: 5px; padding: 6px 12px; font-family: 'Syne Mono', monospace; font-size: 10px; color: var(--ink2); cursor: pointer; letter-spacing: 0.04em; transition: all 0.15s; }
+.action-btn:hover { border-color: var(--accent2); color: var(--accent2); }
+
+.output-grid { display: flex; flex-direction: column; gap: 14px; }
+
+/* ── OUTPUT CARDS ── */
+.out-card { background: var(--surface); border: 1px solid var(--border); border-radius: 10px; overflow: hidden; }
+.out-card-header { padding: 13px 17px; border-bottom: 1px solid var(--border); display: flex; align-items: center; justify-content: space-between; }
+.out-card-title { display: flex; align-items: center; gap: 8px; font-family: 'Syne Mono', monospace; font-size: 10px; letter-spacing: 0.08em; text-transform: uppercase; color: var(--ink2); }
+.out-card-icon { width: 22px; height: 22px; border-radius: 4px; display: flex; align-items: center; justify-content: center; font-size: 11px; }
+.out-card-body { padding: 17px; }
+
+/* ── REGION CONTEXT CARD ── */
+.region-context {
+  background: linear-gradient(135deg, var(--ink) 0%, #2d3a4a 100%);
+  color: white; border-radius: 10px; padding: 18px 20px;
+  margin-bottom: 14px;
+}
+.rc-top { display: flex; align-items: center; gap: 12px; margin-bottom: 12px; }
+.rc-flag { font-size: 28px; }
+.rc-country { font-family: 'Lora', serif; font-size: 18px; letter-spacing: -0.01em; }
+.rc-sub { font-family: 'Syne Mono', monospace; font-size: 10px; color: rgba(255,255,255,0.45); margin-top: 2px; }
+.rc-tags { display: flex; flex-wrap: wrap; gap: 5px; margin-bottom: 10px; }
+.rc-tag { background: rgba(255,255,255,0.1); border: 1px solid rgba(255,255,255,0.15); border-radius: 4px; padding: 3px 8px; font-family: 'Syne Mono', monospace; font-size: 9px; color: rgba(255,255,255,0.7); letter-spacing: 0.04em; }
+.rc-insight { font-size: 12px; color: rgba(255,255,255,0.65); line-height: 1.6; }
+
+/* ── ZONE REC ── */
+.zone-row-out { display: flex; align-items: center; gap: 10px; padding: 7px 0; border-bottom: 1px solid var(--bg2); }
+.zone-row-out:last-child { border-bottom: none; }
+.zone-icon-out { font-size: 14px; width: 22px; text-align: center; flex-shrink: 0; }
+.zone-name-out { font-size: 12px; font-weight: 600; color: var(--ink2); flex: 1; }
+.zone-track { flex: 2; height: 6px; background: var(--bg2); border-radius: 3px; overflow: hidden; }
+.zone-fill-out { height: 100%; border-radius: 3px; transition: width 0.6s cubic-bezier(0.4,0,0.2,1); }
+.zone-pct-out { font-family: 'Syne Mono', monospace; font-size: 11px; min-width: 34px; text-align: right; }
+.zone-sqft-out { font-family: 'Syne Mono', monospace; font-size: 10px; color: var(--muted); min-width: 80px; text-align: right; }
+
+/* ── CAMPUS LAYOUT ── */
+.campus-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-bottom: 12px; }
+.campus-item { background: var(--bg); border-radius: 7px; padding: 10px 12px; border: 1px solid var(--border); }
+.campus-key { font-family: 'Syne Mono', monospace; font-size: 9px; color: var(--muted); text-transform: uppercase; letter-spacing: 0.08em; margin-bottom: 3px; }
+.campus-val { font-size: 13px; font-weight: 600; }
+
+/* ── BRIEF GRID ── */
+.brief-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-bottom: 12px; }
+.brief-item { background: var(--bg); border-radius: 6px; padding: 9px 11px; border: 1px solid var(--border); }
+.brief-key { font-family: 'Syne Mono', monospace; font-size: 9px; color: var(--muted); text-transform: uppercase; letter-spacing: 0.06em; margin-bottom: 3px; }
+.brief-val { font-size: 12px; font-weight: 600; color: var(--ink); }
+
+.brief-notes { background: var(--bg2); border-radius: 7px; padding: 11px 13px; font-size: 12px; color: var(--ink2); line-height: 1.6; }
+
+/* ── BENCHMARK ── */
+.bench-row { display: flex; align-items: center; gap: 10px; padding: 7px 0; border-bottom: 1px solid var(--bg2); }
+.bench-row:last-child { border-bottom: none; }
+.bench-label { font-size: 11px; color: var(--ink2); flex: 1.2; }
+.bench-track { flex: 2; height: 5px; background: var(--bg2); border-radius: 3px; overflow: hidden; position: relative; }
+.bench-fill { height: 100%; border-radius: 3px; }
+.bench-client-marker { position: absolute; top: -4px; width: 2px; height: 13px; background: var(--accent2); border-radius: 1px; transition: left 0.5s; }
+.bench-vals { font-family: 'Syne Mono', monospace; font-size: 10px; color: var(--muted2); min-width: 90px; text-align: right; }
+.bench-tag { font-family: 'Syne Mono', monospace; font-size: 9px; padding: 2px 7px; border-radius: 3px; letter-spacing: 0.04em; min-width: 52px; text-align: center; }
+.bench-tag.above { background: var(--green-soft); color: var(--green); }
+.bench-tag.below { background: var(--amber-soft); color: var(--amber); }
+.bench-tag.align { background: var(--accent-soft); color: var(--accent2); }
+
+@media print {
+  .header, .discovery-panel, .form-nav, .output-actions { display: none !important; }
+  .app { grid-template-columns: 1fr; }
+  .output-panel { max-height: none; overflow: visible; }
+}
+</style>
+</head>
+<body>
+
+<div class="header">
+  <div class="logo">
+    <div class="logo-mark">ASD</div>
+    <div>
+      <div class="logo-text">APAC Space Discovery</div>
+      <div class="logo-sub">Regional Workplace Intelligence</div>
+    </div>
+  </div>
+  <div class="header-center" id="region-pills"></div>
+  <div class="header-right">
+    <div class="mode-toggle">
+      <button class="mode-btn active" onclick="setMode('consultant',this)">Consultant</button>
+      <button class="mode-btn" onclick="setMode('client',this)">Client</button>
+    </div>
+  </div>
+</div>
+
+<div class="app">
+
+  <!-- LEFT: Discovery -->
+  <div class="discovery-panel">
+
+    <div class="progress-header">
+      <div class="progress-top">
+        <div class="progress-label" id="progress-label">Section 1 of 5</div>
+        <div class="progress-count" id="progress-count">0 fields completed</div>
+      </div>
+      <div class="progress-track"><div class="progress-fill" id="progress-fill" style="width:20%"></div></div>
+      <div class="section-tabs">
+        <button class="section-tab active" onclick="goSection(0)">01 Region</button>
+        <button class="section-tab" onclick="goSection(1)">02 Client</button>
+        <button class="section-tab" onclick="goSection(2)">03 Scale</button>
+        <button class="section-tab" onclick="goSection(3)">04 Work Style</button>
+        <button class="section-tab" onclick="goSection(4)">05 Priorities</button>
+      </div>
+    </div>
+
+    <div class="form-body">
+
+      <!-- S1: Region & Country -->
+      <div class="form-section active" id="section-0">
+        <div class="section-heading">
+          <div class="section-num">Section 01</div>
+          <div class="section-title">Region & Country</div>
+          <div class="section-desc">Sets regional benchmarks, cultural work style presets, and density norms for the output.</div>
+        </div>
+
+        <div class="field-group">
+          <div class="field-label">Primary Country</div>
+          <div class="country-grid" id="country-grid">
+            <div class="country-card" onclick="selectCountry(this,'SG','Singapore','🇸🇬','SEA')"><span class="country-flag">🇸🇬</span><div class="country-name">Singapore</div><div class="country-sub">SEA · Hub</div></div>
+            <div class="country-card" onclick="selectCountry(this,'MY','Malaysia','🇲🇾','SEA')"><span class="country-flag">🇲🇾</span><div class="country-name">Malaysia</div><div class="country-sub">SEA</div></div>
+            <div class="country-card" onclick="selectCountry(this,'TH','Thailand','🇹🇭','SEA')"><span class="country-flag">🇹🇭</span><div class="country-name">Thailand</div><div class="country-sub">SEA</div></div>
+            <div class="country-card" onclick="selectCountry(this,'ID','Indonesia','🇮🇩','SEA')"><span class="country-flag">🇮🇩</span><div class="country-name">Indonesia</div><div class="country-sub">SEA</div></div>
+            <div class="country-card" onclick="selectCountry(this,'PH','Philippines','🇵🇭','SEA')"><span class="country-flag">🇵🇭</span><div class="country-name">Philippines</div><div class="country-sub">SEA</div></div>
+            <div class="country-card" onclick="selectCountry(this,'VN','Vietnam','🇻🇳','SEA')"><span class="country-flag">🇻🇳</span><div class="country-name">Vietnam</div><div class="country-sub">SEA</div></div>
+            <div class="country-card" onclick="selectCountry(this,'CN','China','🇨🇳','GCN')"><span class="country-flag">🇨🇳</span><div class="country-name">China</div><div class="country-sub">GCN · Campus</div></div>
+            <div class="country-card" onclick="selectCountry(this,'HK','Hong Kong','🇭🇰','GCN')"><span class="country-flag">🇭🇰</span><div class="country-name">Hong Kong</div><div class="country-sub">GCN · Dense</div></div>
+            <div class="country-card" onclick="selectCountry(this,'TW','Taiwan','🇹🇼','GCN')"><span class="country-flag">🇹🇼</span><div class="country-name">Taiwan</div><div class="country-sub">GCN</div></div>
+            <div class="country-card" onclick="selectCountry(this,'IN','India','🇮🇳','SA')"><span class="country-flag">🇮🇳</span><div class="country-name">India</div><div class="country-sub">SA · Campus</div></div>
+            <div class="country-card" onclick="selectCountry(this,'JP','Japan','🇯🇵','NEA')"><span class="country-flag">🇯🇵</span><div class="country-name">Japan</div><div class="country-sub">NEA</div></div>
+            <div class="country-card" onclick="selectCountry(this,'KR','South Korea','🇰🇷','NEA')"><span class="country-flag">🇰🇷</span><div class="country-name">South Korea</div><div class="country-sub">NEA</div></div>
+            <div class="country-card" onclick="selectCountry(this,'AU','Australia','🇦🇺','ANZ')"><span class="country-flag">🇦🇺</span><div class="country-name">Australia</div><div class="country-sub">ANZ</div></div>
+            <div class="country-card" onclick="selectCountry(this,'NZ','New Zealand','🇳🇿','ANZ')"><span class="country-flag">🇳🇿</span><div class="country-name">New Zealand</div><div class="country-sub">ANZ</div></div>
+          </div>
+        </div>
+
+        <!-- Cultural insight — populated by JS -->
+        <div class="culture-insight" id="culture-insight">
+          <div class="culture-title">◈ Regional Culture Intelligence</div>
+          <div class="culture-body" id="culture-body"></div>
+          <div id="culture-tags" style="margin-top:8px"></div>
+        </div>
+      </div>
+
+      <!-- S2: Client Context -->
+      <div class="form-section" id="section-1">
+        <div class="section-heading">
+          <div class="section-num">Section 02</div>
+          <div class="section-title">Client Context</div>
+          <div class="section-desc">Company profile. Anchors the benchmark comparison.</div>
+        </div>
+        <div class="field-group">
+          <div class="field-label">Company Name</div>
+          <input type="text" id="f-company" placeholder="e.g. Techco Asia Pte Ltd" oninput="onFieldChange()">
+        </div>
+        <div class="field-group">
+          <div class="field-label">Industry Sector</div>
+          <select id="f-sector" onchange="onFieldChange()">
+            <option value="">Select sector</option>
+            <option>Technology</option>
+            <option>BFSI</option>
+            <option>Professional Services</option>
+            <option>Healthcare & Life Sciences</option>
+            <option>Retail & Consumer</option>
+            <option>Manufacturing & Industrial</option>
+            <option>Education</option>
+            <option>Government & Public Sector</option>
+            <option>Media & Creative</option>
+            <option>Other</option>
+          </select>
+        </div>
+        <div class="field-group">
+          <div class="field-label">Headcount <span class="field-hint">— current · 3yr target</span></div>
+          <div class="input-row">
+            <input type="number" id="f-headcount" placeholder="Current staff" min="1" oninput="onFieldChange()">
+            <input type="number" id="f-headcount-3y" placeholder="3yr target" oninput="onFieldChange()">
+          </div>
+        </div>
+        <div class="field-group">
+          <div class="field-label">Current Space <span class="field-hint">— sqft</span></div>
+          <input type="number" id="f-current-sqft" placeholder="Current total sqft" oninput="onFieldChange()">
+        </div>
+        <div class="field-group">
+          <div class="field-label">Project Type</div>
+          <div class="chip-group" id="chips-project-type">
+            <div class="chip-opt" onclick="toggleChip(this)">New Fitout</div>
+            <div class="chip-opt" onclick="toggleChip(this)">Relocation</div>
+            <div class="chip-opt" onclick="toggleChip(this)">Renovation</div>
+            <div class="chip-opt" onclick="toggleChip(this)">Expansion</div>
+            <div class="chip-opt" onclick="toggleChip(this)">Consolidation</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- S3: Scale & Typology -->
+      <div class="form-section" id="section-2">
+        <div class="section-heading">
+          <div class="section-num">Section 03</div>
+          <div class="section-title">Project Scale</div>
+          <div class="section-desc">Scale unlocks different planning logic. Campus projects get a separate programming layer.</div>
+        </div>
+        <div class="field-group">
+          <div class="field-label">Project Typology</div>
+          <div class="scale-grid">
+            <div class="scale-card" onclick="selectScale(this,'floor')">
+              <div class="scale-icon">🏢</div>
+              <div class="scale-label">Single Floor</div>
+              <div class="scale-sub">Under 20,000 sqft</div>
+            </div>
+            <div class="scale-card" onclick="selectScale(this,'building')">
+              <div class="scale-icon">🏗️</div>
+              <div class="scale-label">Multi-Floor</div>
+              <div class="scale-sub">20k–150k sqft</div>
+            </div>
+            <div class="scale-card" onclick="selectScale(this,'campus')">
+              <div class="scale-icon">🏙️</div>
+              <div class="scale-label">Campus</div>
+              <div class="scale-sub">150k+ sqft · Multi-bldg</div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Campus-specific fields -->
+        <div class="campus-fields" id="campus-fields">
+          <div class="campus-note">◈ Campus Programming Layer</div>
+          <div class="field-group">
+            <div class="field-label">Number of Buildings</div>
+            <input type="number" id="f-buildings" placeholder="e.g. 4" oninput="onFieldChange()">
+          </div>
+          <div class="field-group">
+            <div class="field-label">Campus Anchor Functions</div>
+            <div class="chip-group" id="chips-campus-anchor">
+              <div class="chip-opt" onclick="toggleChip(this)">HQ / Executive Centre</div>
+              <div class="chip-opt" onclick="toggleChip(this)">R&D / Innovation Lab</div>
+              <div class="chip-opt" onclick="toggleChip(this)">Training Academy</div>
+              <div class="chip-opt" onclick="toggleChip(this)">Data Centre</div>
+              <div class="chip-opt" onclick="toggleChip(this)">Shared Services</div>
+              <div class="chip-opt" onclick="toggleChip(this)">Amenity Hub</div>
+              <div class="chip-opt" onclick="toggleChip(this)">Manufacturing / Lab</div>
+            </div>
+          </div>
+          <div class="field-group">
+            <div class="field-label">Outdoor / Landscape Priority</div>
+            <div class="chip-group" id="chips-outdoor">
+              <div class="chip-opt" onclick="toggleChip(this)">Courtyards & Plazas</div>
+              <div class="chip-opt" onclick="toggleChip(this)">Sports & Recreation</div>
+              <div class="chip-opt" onclick="toggleChip(this)">Staff Housing</div>
+              <div class="chip-opt" onclick="toggleChip(this)">Dining & Retail</div>
+            </div>
+          </div>
+        </div>
+
+        <div class="field-group" style="margin-top:14px">
+          <div class="field-label">Target Total sqft</div>
+          <input type="number" id="f-target-sqft" placeholder="Target or indicative sqft" oninput="onFieldChange()">
+        </div>
+      </div>
+
+      <!-- S4: Work Style -->
+      <div class="form-section" id="section-3">
+        <div class="section-heading">
+          <div class="section-num">Section 04</div>
+          <div class="section-title">Work Style</div>
+          <div class="section-desc">How the team actually works. This drives zone allocation directly.</div>
+        </div>
+        <div class="field-group">
+          <div class="field-label">Work Model</div>
+          <div class="chip-group" id="chips-work-model">
+            <div class="chip-opt" onclick="toggleChip(this)">Fully On-Site</div>
+            <div class="chip-opt" onclick="toggleChip(this)">Hybrid 4+1</div>
+            <div class="chip-opt" onclick="toggleChip(this)">Hybrid 3+2</div>
+            <div class="chip-opt" onclick="toggleChip(this)">Hybrid 2+3</div>
+            <div class="chip-opt" onclick="toggleChip(this)">Activity-Based Working</div>
+            <div class="chip-opt" onclick="toggleChip(this)">Mostly Remote</div>
+          </div>
+        </div>
+        <div class="field-group">
+          <div class="field-label">Peak Attendance <span class="field-hint">— % of headcount on-site</span></div>
+          <div class="slider-wrap">
+            <input type="range" id="f-attendance" min="20" max="100" value="75" oninput="updateSlider('attendance');onFieldChange()">
+            <div class="slider-val" id="attendance-val">75%</div>
+          </div>
+        </div>
+        <div class="field-group">
+          <div class="field-label">Primary Activities</div>
+          <div class="chip-group" id="chips-activities">
+            <div class="chip-opt" onclick="toggleChip(this)">Deep focus work</div>
+            <div class="chip-opt" onclick="toggleChip(this)">Team collaboration</div>
+            <div class="chip-opt" onclick="toggleChip(this)">Client-facing meetings</div>
+            <div class="chip-opt" onclick="toggleChip(this)">Video & virtual calls</div>
+            <div class="chip-opt" onclick="toggleChip(this)">Training & learning</div>
+            <div class="chip-opt" onclick="toggleChip(this)">Social & culture</div>
+            <div class="chip-opt" onclick="toggleChip(this)">Sensitive / confidential work</div>
+          </div>
+        </div>
+        <div class="field-group">
+          <div class="field-label">Current Pain Points</div>
+          <div class="pain-grid">
+            <div class="pain-card" onclick="togglePain(this)"><div class="pain-icon">🔇</div><div class="pain-text">Noise / no focus zones</div></div>
+            <div class="pain-card" onclick="togglePain(this)"><div class="pain-icon">🤝</div><div class="pain-text">Insufficient collab space</div></div>
+            <div class="pain-card" onclick="togglePain(this)"><div class="pain-icon">📞</div><div class="pain-text">No private call spaces</div></div>
+            <div class="pain-card" onclick="togglePain(this)"><div class="pain-icon">📅</div><div class="pain-text">Meeting room shortage</div></div>
+            <div class="pain-card" onclick="togglePain(this)"><div class="pain-icon">🌿</div><div class="pain-text">Poor wellbeing / amenities</div></div>
+            <div class="pain-card" onclick="togglePain(this)"><div class="pain-icon">📦</div><div class="pain-text">Space too dense / cramped</div></div>
+            <div class="pain-card" onclick="togglePain(this)"><div class="pain-icon">🧭</div><div class="pain-text">Poor layout logic</div></div>
+            <div class="pain-card" onclick="togglePain(this)"><div class="pain-icon">🌡️</div><div class="pain-text">Poor thermal / air quality</div></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- S5: Priorities & Budget -->
+      <div class="form-section" id="section-4">
+        <div class="section-heading">
+          <div class="section-num">Section 05</div>
+          <div class="section-title">Priorities & Investment</div>
+          <div class="section-desc">Design intent and project budget. Shapes the zone weighting and recommendation tone.</div>
+        </div>
+        <div class="field-group">
+          <div class="field-label">Top Design Priority</div>
+          <div class="chip-group" id="chips-priority">
+            <div class="chip-opt" onclick="toggleChip(this)">Maximise collaboration</div>
+            <div class="chip-opt" onclick="toggleChip(this)">Improve focus & productivity</div>
+            <div class="chip-opt" onclick="toggleChip(this)">Elevate brand presence</div>
+            <div class="chip-opt" onclick="toggleChip(this)">Optimise space efficiency</div>
+            <div class="chip-opt" onclick="toggleChip(this)">Staff wellbeing & biophilia</div>
+            <div class="chip-opt" onclick="toggleChip(this)">Attract & retain talent</div>
+            <div class="chip-opt" onclick="toggleChip(this)">ESG / Sustainability</div>
+          </div>
+        </div>
+        <div class="field-group">
+          <div class="field-label">Budget Signal <span class="field-hint">— USD per sqft fitout cost</span></div>
+          <div class="budget-grid">
+            <div class="budget-card" onclick="toggleBudget(this)"><div class="budget-range">$30–60</div><div class="budget-label">Value</div></div>
+            <div class="budget-card" onclick="toggleBudget(this)"><div class="budget-range">$60–100</div><div class="budget-label">Mid</div></div>
+            <div class="budget-card" onclick="toggleBudget(this)"><div class="budget-range">$100–160</div><div class="budget-label">Premium</div></div>
+            <div class="budget-card" onclick="toggleBudget(this)"><div class="budget-range">$160–250</div><div class="budget-label">Luxury</div></div>
+            <div class="budget-card" onclick="toggleBudget(this)"><div class="budget-range">$250+</div><div class="budget-label">Flagship</div></div>
+            <div class="budget-card" onclick="toggleBudget(this)"><div class="budget-range">TBD</div><div class="budget-label">To confirm</div></div>
+          </div>
+        </div>
+        <div class="field-group">
+          <div class="field-label">Timeline</div>
+          <div class="chip-group" id="chips-timeline">
+            <div class="chip-opt" onclick="toggleChip(this)">Under 3 months</div>
+            <div class="chip-opt" onclick="toggleChip(this)">3–6 months</div>
+            <div class="chip-opt" onclick="toggleChip(this)">6–12 months</div>
+            <div class="chip-opt" onclick="toggleChip(this)">12–24 months</div>
+            <div class="chip-opt" onclick="toggleChip(this)">24+ months</div>
+          </div>
+        </div>
+        <div class="field-group">
+          <div class="field-label">Additional Notes</div>
+          <textarea id="f-notes" placeholder="CEO priorities, sustainability mandates, brand refresh context, local authority requirements..." oninput="onFieldChange()"></textarea>
+        </div>
+      </div>
+    </div>
+
+    <div class="form-nav">
+      <button class="btn btn-ghost" id="btn-back" onclick="navigate(-1)" style="visibility:hidden">← Back</button>
+      <div class="live-row"><div class="live-dot"></div><span>Output updating live</span></div>
+      <button class="btn btn-primary" id="btn-next" onclick="navigate(1)">Next →</button>
+    </div>
+  </div>
+
+  <!-- RIGHT: Output -->
+  <div class="output-panel" id="output-panel">
+    <div class="empty-state" id="empty-state">
+      <div class="empty-icon">◎</div>
+      <div class="empty-title">Select a country to begin</div>
+      <div class="empty-sub">Regional intelligence, zone benchmarks, and cultural work style presets load automatically.</div>
+      <div class="empty-hint">← Start with Region & Country</div>
+    </div>
+    <div id="output-content" style="display:none">
+      <div class="output-header">
+        <div>
+          <div class="output-title" id="out-title">Space Brief</div>
+          <div class="output-meta" id="out-meta">—</div>
+        </div>
+        <div class="output-actions">
+          <button class="action-btn" onclick="window.print()">⬇ Export PDF</button>
+          <button class="action-btn" onclick="copyBrief()">⎘ Copy Brief</button>
+        </div>
+      </div>
+      <div class="output-grid" id="output-grid"></div>
+    </div>
+  </div>
+
+</div>
+
+<script>
+// ── REGIONAL INTELLIGENCE DATABASE ────────────────────────────────────────
+
+const COUNTRY_DATA = {
+  SG: {
+    name:'Singapore', flag:'🇸🇬', region:'SEA',
+    density: 90, // sqft/person — very tight, premium real estate
+    benchmarks: { collab:44, focus:34, meeting:12, reception:5, pantry:3, workstation:2 },
+    culture: "Singapore offices are among the most space-efficient in APAC — expect 80–100 sqft/person norms driven by Grade A rental costs exceeding $12/sqft/month. Activity-Based Working (ABW) is mainstream, especially in BFSI and Tech. Strong demand for hospitality-style reception and brand-forward arrival experiences. Wellness rooms and nursing rooms are increasingly standard for talent retention.",
+    cultureTags: ['ABW Standard', 'High Real Estate Cost', 'Premium Finish Expected', 'Wellness Mandatory', 'Hybrid 3+2 Dominant'],
+    budgetMultiplier: 1.4, // vs base
+    campusEligible: false,
+  },
+  MY: {
+    name:'Malaysia', flag:'🇲🇾', region:'SEA',
+    density: 115,
+    benchmarks: { collab:40, focus:36, meeting:12, reception:5, pantry:5, workstation:2 },
+    culture: "Malaysian offices blend Western open-plan with strong pantry culture — the pantry and breakout area is a genuine collaboration anchor, not just a coffee point. Assigned seating remains dominant outside MNC offices. Prayer rooms and ablution facilities are non-negotiable for Muslim staff — typically 1–2% of floor area. Biophilic elements are well-received and increasingly expected.",
+    cultureTags: ['Prayer Room Required', 'Strong Pantry Culture', 'Assigned Seating Common', 'Biophilic Trending', 'Hybrid Emerging'],
+    budgetMultiplier: 0.8,
+    campusEligible: false,
+  },
+  TH: {
+    name:'Thailand', flag:'🇹🇭', region:'SEA',
+    density: 110,
+    benchmarks: { collab:38, focus:38, meeting:12, reception:6, pantry:4, workstation:2 },
+    culture: "Thai workplace culture places high value on hierarchical space — private offices for senior management remain expected even in otherwise open environments. Aesthetic presentation matters deeply; high-quality finishes signal company status to clients and staff. Collaborative spaces are growing but must be balanced with sufficient quiet zones for detail-oriented work cultures.",
+    cultureTags: ['Hierarchy Space Required', 'Aesthetic Sensitivity High', 'Senior Private Offices', 'Hybrid Moderate', 'Client Impression Priority'],
+    budgetMultiplier: 0.85,
+    campusEligible: false,
+  },
+  ID: {
+    name:'Indonesia', flag:'🇮🇩', region:'SEA',
+    density: 100,
+    benchmarks: { collab:38, focus:36, meeting:13, reception:6, pantry:5, workstation:2 },
+    culture: "Indonesian offices in Jakarta CBD operate at high density due to real estate costs, but regional cities allow more generous footprints. Prayer facilities are mandatory and should be generous — Indonesian Muslim prayer culture means prayer rooms see daily peak usage. Strong preference for warm, social environments with generous pantry and food areas. Informal collaboration over structured meeting rooms.",
+    cultureTags: ['Prayer Facilities Mandatory', 'Social Spaces Priority', 'Dense CBD Norm', 'Informal Collab Preferred', 'Warm Aesthetic Expected'],
+    budgetMultiplier: 0.75,
+    campusEligible: false,
+  },
+  PH: {
+    name:'Philippines', flag:'🇵🇭', region:'SEA',
+    density: 95,
+    benchmarks: { collab:42, focus:33, meeting:13, reception:5, pantry:5, workstation:2 },
+    culture: "Philippine offices, especially BPO and Tech, are among the highest-occupancy in APAC — 83% employee engagement rate, highest in region (Qualtrics 2024). Strong culture of teamwork and social connection drives generous collaboration and pantry allocation. Video call infrastructure is critical given regional distributed team norms. Night-shift-friendly lighting and amenities matter for BPO clients.",
+    cultureTags: ['Highest APAC Engagement', 'BPO Infrastructure Needs', 'Strong Social Culture', 'Night Shift Considerations', 'Team-First Design'],
+    budgetMultiplier: 0.7,
+    campusEligible: false,
+  },
+  VN: {
+    name:'Vietnam', flag:'🇻🇳', region:'SEA',
+    density: 95,
+    benchmarks: { collab:38, focus:40, meeting:11, reception:5, pantry:4, workstation:2 },
+    culture: "Vietnamese offices are growing rapidly in HCMC and Hanoi with strong tech sector demand. Dense workstation clusters remain common in local firms, while MNCs trend toward more open collaborative environments. Young workforce (median age 30) drives demand for social and wellness spaces. Strong return-to-office compliance — Vietnamese employees show high preference for in-office work.",
+    cultureTags: ['Dense Workstation Clusters', 'Young Workforce', 'High RTO Compliance', 'Tech Sector Growth', 'Social Spaces Valued'],
+    budgetMultiplier: 0.65,
+    campusEligible: false,
+  },
+  CN: {
+    name:'China', flag:'🇨🇳', region:'GCN',
+    density: 55, // very high density
+    benchmarks: { collab:36, focus:40, meeting:10, reception:5, pantry:3, workstation:6 },
+    culture: "Chinese offices operate at the highest density in APAC — 50–60 sqft/person is standard in tier-1 cities. Large cluster workstations of 6–12 people are the cultural norm, reflecting team-based work cultures. Campus projects dominate for major tech and manufacturing firms (Alibaba, Tencent, Huawei models). Cafeteria and staff dining is critical — lunch culture is deeply embedded. Strong surveillance and access control integration expected.",
+    cultureTags: ['Cluster Workstation Norm', 'Ultra-High Density', 'Campus Scale Common', 'Staff Dining Critical', 'Surveillance Integration', 'Team Cluster Layout'],
+    budgetMultiplier: 0.9,
+    campusEligible: true,
+  },
+  HK: {
+    name:'Hong Kong', flag:'🇭🇰', region:'GCN',
+    density: 80,
+    benchmarks: { collab:40, focus:36, meeting:14, reception:5, pantry:3, workstation:2 },
+    culture: "Hong Kong operates at extreme space premium — Grade A office in Central exceeds $122/sqm/month (Q1 2024). Maximum space efficiency is non-negotiable; every sqft must justify its cost. Despite density, there is strong demand for premium finishes — HK clients expect luxury-tier execution at high-efficiency footprints. Financial services sector drives structured, enclosed meeting room demand.",
+    cultureTags: ['Highest APAC Rent', 'Maximum Efficiency Required', 'Premium Finish Standard', 'BFSI Dominant', 'Enclosed Meeting Priority'],
+    budgetMultiplier: 1.6,
+    campusEligible: false,
+  },
+  TW: {
+    name:'Taiwan', flag:'🇹🇼', region:'GCN',
+    density: 100,
+    benchmarks: { collab:38, focus:40, meeting:12, reception:4, pantry:4, workstation:2 },
+    culture: "Taiwanese offices balance precision-oriented work culture with growing collaborative demand. Tech semiconductor sector (TSMC supply chain) drives strong demand for clean, functional environments with excellent ergonomics. Hierarchy is respected — management zones remain somewhat separated. Work-life balance awareness is growing with younger workforce pushing for better wellness and social amenities.",
+    cultureTags: ['Tech / Semiconductor Led', 'Ergonomic Priority', 'Hierarchy Respected', 'Growing Wellness Demand', 'Clean Functional Aesthetic'],
+    budgetMultiplier: 0.95,
+    campusEligible: false,
+  },
+  IN: {
+    name:'India', flag:'🇮🇳', region:'SA',
+    density: 85,
+    benchmarks: { collab:40, focus:38, meeting:12, reception:4, pantry:4, workstation:2 },
+    culture: "India is APAC's fastest-growing office market — commanding over 50% of regional demand in 2024 (Colliers). Bangalore, Hyderabad, and Delhi lead. Campus projects dominate for GCCs (Global Capability Centres) of MNCs — Infosys, TCS, Wipro campus benchmarks are the reference. Face-to-face collaboration is culturally expected. Cafeteria and staff dining are essential on any project above 500 seats. Diversity-inclusive design (multi-faith, accessibility) increasingly required by MNC occupiers.",
+    cultureTags: ['Fastest Growing Market', 'GCC / Campus Dominant', 'Face-to-Face Culture', 'Cafeteria Essential 500+ pax', 'Multi-Faith Rooms', 'Hybrid 3+2 Emerging'],
+    budgetMultiplier: 0.65,
+    campusEligible: true,
+  },
+  JP: {
+    name:'Japan', flag:'🇯🇵', region:'NEA',
+    density: 75,
+    benchmarks: { collab:32, focus:46, meeting:12, reception:5, pantry:3, workstation:2 },
+    culture: "Japanese offices are uniquely structured around the 'desk island' (shima) — rectangular cluster workstations where teams sit together facing each other. Private enclosed offices are rare; even CEOs often sit in open plans. Focus and quiet work are culturally paramount — noise discipline is strong. Only 38% of Japanese employees feel engaged (Qualtrics 2024), the lowest in APAC, driving demand for redesigned social and culture spaces. Meeting rooms are heavily utilised for private discussions that can't happen in open plan.",
+    cultureTags: ['Desk Island / Shima Layout', 'Lowest APAC Engagement', 'Focus-First Culture', 'No Private CEO Offices', 'Formal Meeting Room Culture', 'Quiet Discipline Expected'],
+    budgetMultiplier: 1.1,
+    campusEligible: false,
+  },
+  KR: {
+    name:'South Korea', flag:'🇰🇷', region:'NEA',
+    density: 90,
+    benchmarks: { collab:38, focus:40, meeting:13, reception:5, pantry:3, workstation:1 },
+    culture: "South Korean chaebols (Samsung, LG, Hyundai) set the workplace design reference — large, prestigious HQ campuses with strong brand presence. Hierarchy is embedded in spatial planning; executive floors remain a distinct design zone. Long working hours culture means quality rest areas, premium cafeteria, and wellness facilities are retention-critical. Growing Gen Z workforce pushing for more social, less hierarchical environments.",
+    cultureTags: ['Chaebol HQ Reference', 'Executive Zone Required', 'Long Hours Culture', 'Premium Cafeteria Critical', 'Gen Z Transformation', 'Wellness Retention Signal'],
+    budgetMultiplier: 1.05,
+    campusEligible: false,
+  },
+  AU: {
+    name:'Australia', flag:'🇦🇺', region:'ANZ',
+    density: 130,
+    benchmarks: { collab:44, focus:34, meeting:11, reception:5, pantry:4, workstation:2 },
+    culture: "Australian offices lead APAC in Activity-Based Working adoption — genuine ABW with no assigned seating is mainstream in Sydney and Melbourne. 15% voluntary turnover rate (highest in APAC) means talent retention through exceptional amenity and culture space is business-critical. Biophilic design and natural light are non-negotiable expectations. Strong sustainability credentials required — NABERS and Green Star ratings influence design decisions.",
+    cultureTags: ['ABW Most Mature', 'Highest Turnover Rate', 'Biophilic Non-Negotiable', 'NABERS / Green Star', 'Talent Retention Priority', 'Generous Density Norms'],
+    budgetMultiplier: 1.3,
+    campusEligible: false,
+  },
+  NZ: {
+    name:'New Zealand', flag:'🇳🇿', region:'ANZ',
+    density: 135,
+    benchmarks: { collab:44, focus:34, meeting:11, reception:5, pantry:4, workstation:2 },
+    culture: "New Zealand shares Australia's ABW maturity and biophilic design values with a stronger emphasis on community and wellbeing. 15% turnover rate mirrors Australia. Smaller market scale means projects are typically single-floor or boutique multi-floor. Māori cultural considerations — appropriate acknowledgment through design, art, and spatial planning — increasingly expected in public sector and enterprise projects.",
+    cultureTags: ['ABW Mature', 'Biophilic Priority', 'Cultural Acknowledgment', 'Wellbeing Focus', 'Smaller Scale Projects'],
+    budgetMultiplier: 1.2,
+    campusEligible: false,
+  },
+};
+
+const ZONE_META = {
+  collab:      { label:'Collaboration',      icon:'🤝', color:'#2d7a8a' },
+  focus:       { label:'Focus / Quiet',       icon:'🔇', color:'#1a4a6b' },
+  meeting:     { label:'Meeting Rooms',       icon:'📅', color:'#2d6a4f' },
+  reception:   { label:'Reception & Arrival', icon:'🏛️', color:'#7a4f10' },
+  pantry:      { label:'Pantry & Breakout',   icon:'☕', color:'#6a3a7a' },
+  workstation: { label:'Workstation Cluster', icon:'💻', color:'#3a6a4a' },
+};
+
+// ── STATE ─────────────────────────────────────────────────────────────────
+
+let currentSection = 0;
+const totalSections = 5;
+let selectedCountry = null;
+let selectedScale = null;
+
+// ── COUNTRY SELECTION ─────────────────────────────────────────────────────
+
+function selectCountry(el, code, name, flag, region) {
+  document.querySelectorAll('.country-card').forEach(c => c.classList.remove('selected'));
+  el.classList.add('selected');
+  selectedCountry = code;
+
+  // Update culture insight
+  const data = COUNTRY_DATA[code];
+  document.getElementById('culture-body').textContent = data.culture;
+  document.getElementById('culture-tags').innerHTML = data.cultureTags.map(t =>
+    `<span class="culture-tag">${t}</span>`
+  ).join('');
+  document.getElementById('culture-insight').classList.add('visible');
+
+  // Update campus eligibility hint
+  if (data.campusEligible) {
+    document.querySelector('[onclick="selectScale(this,\'campus\')"]').style.borderColor = 'var(--accent2)';
+  }
+
+  updateRegionPills(region);
+  onFieldChange();
+}
+
+function updateRegionPills(activeRegion) {
+  const regions = ['SEA','GCN','SA','NEA','ANZ'];
+  const labels = { SEA:'Southeast Asia', GCN:'Greater China', SA:'South Asia', NEA:'Northeast Asia', ANZ:'ANZ' };
+  document.getElementById('region-pills').innerHTML = regions.map(r =>
+    `<div class="region-pill ${r===activeRegion?'active':''}">${labels[r]}</div>`
+  ).join('');
+}
+
+// ── SCALE SELECTION ───────────────────────────────────────────────────────
+
+function selectScale(el, scale) {
+  document.querySelectorAll('.scale-card').forEach(c => c.classList.remove('selected'));
+  el.classList.add('selected');
+  selectedScale = scale;
+  document.getElementById('campus-fields').classList.toggle('visible', scale==='campus');
+  onFieldChange();
+}
+
+// ── CONTROLS ─────────────────────────────────────────────────────────────
+
+function toggleChip(el) { el.classList.toggle('selected'); onFieldChange(); }
+function togglePain(el) { el.classList.toggle('selected'); onFieldChange(); }
+function toggleBudget(el) {
+  document.querySelectorAll('.budget-card').forEach(c => c.classList.remove('selected'));
+  el.classList.add('selected'); onFieldChange();
+}
+function updateSlider(key) {
+  const el = document.getElementById(`f-${key}`);
+  const v = document.getElementById(`${key}-val`);
+  if(key==='attendance') v.textContent = el.value+'%';
+}
+function setMode(m, btn) {
+  document.querySelectorAll('.mode-btn').forEach(b => b.classList.remove('active'));
+  btn.classList.add('active');
+}
+
+// ── NAVIGATION ────────────────────────────────────────────────────────────
+
+function goSection(idx) {
+  document.getElementById(`section-${currentSection}`).classList.remove('active');
+  document.querySelectorAll('.section-tab')[currentSection].classList.remove('active');
+  currentSection = idx;
+  document.getElementById(`section-${currentSection}`).classList.add('active');
+  document.querySelectorAll('.section-tab').forEach((t,i) => t.classList.toggle('active', i===currentSection));
+  updateNav();
+  const pct = ((currentSection+1)/totalSections)*100;
+  document.getElementById('progress-fill').style.width = pct+'%';
+  document.getElementById('progress-label').textContent = `Section ${currentSection+1} of ${totalSections}`;
+}
+
+function navigate(dir) {
+  const next = currentSection+dir;
+  if(next<0||next>=totalSections) return;
+  document.querySelectorAll('.section-tab')[currentSection].classList.add('done');
+  goSection(next);
+}
+
+function updateNav() {
+  document.getElementById('btn-back').style.visibility = currentSection===0?'hidden':'visible';
+  const next = document.getElementById('btn-next');
+  if(currentSection===totalSections-1) {
+    next.textContent='Generate Brief ✦'; next.className='btn btn-generate';
+    next.onclick=()=>{ generateOutput(); };
+  } else {
+    next.textContent='Next →'; next.className='btn btn-primary';
+    next.onclick=()=>navigate(1);
+  }
+}
+
+// ── DATA COLLECTION ───────────────────────────────────────────────────────
+
+function getData() {
+  const cData = selectedCountry ? COUNTRY_DATA[selectedCountry] : null;
+  return {
+    country: selectedCountry,
+    countryData: cData,
+    scale: selectedScale,
+    company: document.getElementById('f-company').value||'',
+    sector: document.getElementById('f-sector').value||'',
+    headcount: parseInt(document.getElementById('f-headcount').value)||0,
+    headcount3y: parseInt(document.getElementById('f-headcount-3y').value)||0,
+    currentSqft: parseInt(document.getElementById('f-current-sqft').value)||0,
+    targetSqft: parseInt(document.getElementById('f-target-sqft').value)||0,
+    attendance: parseInt(document.getElementById('f-attendance').value)||75,
+    buildings: parseInt(document.getElementById('f-buildings').value)||0,
+    notes: document.getElementById('f-notes').value||'',
+    budget: document.querySelector('.budget-card.selected .budget-range')?.textContent||'TBD',
+    workModel: [...document.querySelectorAll('#chips-work-model .chip-opt.selected')].map(e=>e.textContent),
+    activities: [...document.querySelectorAll('#chips-activities .chip-opt.selected')].map(e=>e.textContent),
+    priority: [...document.querySelectorAll('#chips-priority .chip-opt.selected')].map(e=>e.textContent),
+    timeline: [...document.querySelectorAll('#chips-timeline .chip-opt.selected')].map(e=>e.textContent),
+    projectType: [...document.querySelectorAll('#chips-project-type .chip-opt.selected')].map(e=>e.textContent),
+    campusAnchors: [...document.querySelectorAll('#chips-campus-anchor .chip-opt.selected')].map(e=>e.textContent),
+    pains: [...document.querySelectorAll('.pain-card.selected .pain-text')].map(e=>e.textContent.trim()),
+  };
+}
+
+function calcZones(d) {
+  const base = d.countryData ? {...d.countryData.benchmarks} : {collab:40,focus:38,meeting:12,reception:5,pantry:3,workstation:2};
+
+  // Work model adjustments
+  if(d.workModel.some(w=>w.includes('Activity-Based'))) { base.collab+=5; base.focus-=3; }
+  if(d.workModel.includes('Fully On-Site')) { base.focus+=4; base.workstation+=2; }
+  if(d.workModel.some(w=>w.includes('Mostly Remote'))) { base.collab+=6; base.meeting+=2; }
+
+  // Activity adjustments
+  if(d.activities.includes('Deep focus work')) base.focus+=4;
+  if(d.activities.includes('Team collaboration')) base.collab+=4;
+  if(d.activities.includes('Client-facing meetings')) { base.meeting+=3; base.reception+=2; }
+  if(d.activities.includes('Training & learning')) base.meeting+=3;
+  if(d.activities.includes('Social & culture')) base.pantry+=3;
+
+  // Priority adjustments
+  if(d.priority.includes('Maximise collaboration')) base.collab+=5;
+  if(d.priority.includes('Improve focus & productivity')) base.focus+=5;
+  if(d.priority.includes('Elevate brand presence')) base.reception+=4;
+  if(d.priority.includes('Staff wellbeing & biophilia')) base.pantry+=3;
+
+  // Campus scale — add wellbeing category weight
+  if(d.scale==='campus') { base.pantry+=4; base.collab+=2; }
+
+  // Normalise
+  const total = Object.values(base).reduce((a,b)=>a+b,0);
+  const scale = 100/total;
+  Object.keys(base).forEach(k => base[k] = Math.round(base[k]*scale));
+  return base;
+}
+
+function calcSqft(d) {
+  if(!d.countryData) return 0;
+  const density = d.countryData.density;
+  const peak = d.headcount3y || d.headcount;
+  const peakOcc = peak*(d.attendance/100);
+  const raw = peakOcc*density;
+  // Campus gets a multiplier for circulation, amenity, outdoor connection
+  const campusMult = d.scale==='campus' ? 1.3 : (d.scale==='building' ? 1.15 : 1.05);
+  return d.targetSqft || Math.round(raw*campusMult);
+}
+
+// ── RENDER ────────────────────────────────────────────────────────────────
+
+let updateTimer;
+function onFieldChange() {
+  clearTimeout(updateTimer);
+  updateTimer = setTimeout(()=>{
+    if(selectedCountry) { showOutput(); renderOutput(); }
+  }, 250);
+}
+
+function showOutput() {
+  document.getElementById('empty-state').style.display='none';
+  document.getElementById('output-content').style.display='block';
+}
+
+function generateOutput() { showOutput(); renderOutput(); document.getElementById('output-panel').scrollTo({top:0,behavior:'smooth'}); }
+
+function renderOutput() {
+  const d = getData();
+  if(!d.countryData) return;
+  const zones = calcZones(d);
+  const recSqft = calcSqft(d);
+  const budgetMult = d.countryData.budgetMultiplier;
+
+  document.getElementById('out-title').textContent = d.company || d.countryData.name+' Space Brief';
+  document.getElementById('out-meta').textContent =
+    [d.countryData.name, d.sector, d.scale?.toUpperCase()].filter(Boolean).join(' · ') +
+    ' · '+new Date().toLocaleDateString('en-US',{day:'numeric',month:'short',year:'numeric'});
+
+  const grid = document.getElementById('output-grid');
+  grid.innerHTML = '';
+
+  // ── REGION CONTEXT CARD ──
+  const rc = document.createElement('div');
+  rc.className = 'region-context';
+  rc.innerHTML = `
+    <div class="rc-top">
+      <div class="rc-flag">${d.countryData.flag}</div>
+      <div>
+        <div class="rc-country">${d.countryData.name} · ${d.countryData.region}</div>
+        <div class="rc-sub">Regional density norm · ${d.countryData.density} sqft/person · Budget multiplier ${budgetMult}×</div>
+      </div>
+    </div>
+    <div class="rc-tags">${d.countryData.cultureTags.map(t=>`<span class="rc-tag">${t}</span>`).join('')}</div>
+    <div class="rc-insight">${d.countryData.culture.split('.')[0]+'.'+d.countryData.culture.split('.')[1]+'.'}</div>
+  `;
+  grid.appendChild(rc);
+
+  // ── CAMPUS CARD (if applicable) ──
+  if(d.scale==='campus') {
+    const cc = document.createElement('div');
+    cc.className = 'out-card';
+    const totalBudget = recSqft ? Math.round(recSqft * 100 * budgetMult) : 0; // midpoint $100/sqft
+    cc.innerHTML = `
+      <div class="out-card-header">
+        <div class="out-card-title"><div class="out-card-icon" style="background:rgba(138,90,184,0.1)">🏙️</div>Campus Programming</div>
+        <div style="font-family:'Syne Mono',monospace;font-size:10px;color:var(--muted)">${d.countryData.campusEligible?'✦ Campus common in '+d.countryData.name:'⚠ Verify campus viability for this market'}</div>
+      </div>
+      <div class="out-card-body">
+        <div class="campus-grid">
+          <div class="campus-item"><div class="campus-key">Total Target sqft</div><div class="campus-val">${recSqft?recSqft.toLocaleString()+' sqft':'—'}</div></div>
+          <div class="campus-item"><div class="campus-key">Buildings</div><div class="campus-val">${d.buildings||'TBD'}</div></div>
+          <div class="campus-item"><div class="campus-key">Est. Budget Range</div><div class="campus-val">${recSqft?'$'+Math.round(recSqft*60*budgetMult/1e6,1).toFixed(1)+'M – $'+Math.round(recSqft*160*budgetMult/1e6,1).toFixed(1)+'M':'—'}</div></div>
+          <div class="campus-item"><div class="campus-key">Density Baseline</div><div class="campus-val">${d.countryData.density} sqft/pax</div></div>
+        </div>
+        ${d.campusAnchors.length ? `<div style="margin-top:8px"><div style="font-family:'Syne Mono',monospace;font-size:9px;color:var(--muted);text-transform:uppercase;letter-spacing:0.08em;margin-bottom:6px">Anchor Functions</div><div style="display:flex;flex-wrap:wrap;gap:5px">${d.campusAnchors.map(a=>`<span style="background:var(--bg2);border:1px solid var(--border);border-radius:4px;padding:3px 8px;font-size:11px">${a}</span>`).join('')}</div></div>` : ''}
+      </div>
+    `;
+    grid.appendChild(cc);
+  }
+
+  // ── ZONE RECOMMENDATION CARD ──
+  const zc = document.createElement('div');
+  zc.className = 'out-card';
+  const zoneRows = Object.entries(zones).map(([key, pct]) => {
+    const m = ZONE_META[key];
+    const sqft = recSqft ? Math.round(recSqft*pct/100) : 0;
+    return `<div class="zone-row-out">
+      <div class="zone-icon-out">${m.icon}</div>
+      <div class="zone-name-out">${m.label}</div>
+      <div class="zone-track"><div class="zone-fill-out" style="width:${pct*2}%;background:${m.color}"></div></div>
+      <div class="zone-pct-out" style="color:${m.color}">${pct}%</div>
+      <div class="zone-sqft-out">${sqft?'~'+sqft.toLocaleString()+' sqft':''}</div>
+    </div>`;
+  }).join('');
+  zc.innerHTML = `
+    <div class="out-card-header">
+      <div class="out-card-title"><div class="out-card-icon" style="background:rgba(26,74,107,0.1)">◈</div>Zone Recommendation</div>
+      <div style="font-family:'Syne Mono',monospace;font-size:10px;color:var(--muted)">${d.countryData.name} · ${d.sector||'All Sectors'} profile</div>
+    </div>
+    <div class="out-card-body">${zoneRows}
+      ${d.scale==='campus'?'<div style="margin-top:12px;padding:10px 12px;background:rgba(138,90,184,0.06);border-left:3px solid #8a5ab8;border-radius:5px;font-size:12px;color:var(--ink2)">Campus note: Add 15–20% circulation and amenity premium to all zone sqft estimates. Outdoor/landscape budget is separate from interior fitout.</div>':''}
+    </div>
+  `;
+  grid.appendChild(zc);
+
+  // ── SPACE BRIEF CARD ──
+  const bc = document.createElement('div');
+  bc.className = 'out-card';
+  const estBudgetLow = recSqft ? '$'+(recSqft*60*budgetMult/1e6).toFixed(1)+'M' : '—';
+  const estBudgetHigh = recSqft ? '$'+(recSqft*160*budgetMult/1e6).toFixed(1)+'M' : '—';
+  const briefItems = [
+    {k:'Company',val:d.company||'—'},
+    {k:'Country',val:d.countryData.flag+' '+d.countryData.name},
+    {k:'Sector',val:d.sector||'—'},
+    {k:'Project Scale',val:d.scale?d.scale.charAt(0).toUpperCase()+d.scale.slice(1):'—'},
+    {k:'Headcount Now',val:d.headcount?d.headcount+' pax':'—'},
+    {k:'3yr Target',val:d.headcount3y?d.headcount3y+' pax':'—'},
+    {k:'Work Model',val:d.workModel.join(', ')||'—'},
+    {k:'Rec. Total sqft',val:recSqft?'~'+recSqft.toLocaleString()+' sqft':'—'},
+    {k:'Budget Range (USD)',val:recSqft?estBudgetLow+' – '+estBudgetHigh:'—'},
+    {k:'Timeline',val:d.timeline.join(', ')||'—'},
+  ].map(i=>`<div class="brief-item"><div class="brief-key">${i.k}</div><div class="brief-val">${i.val}</div></div>`).join('');
+  const painStr = d.pains.length?d.pains.map(p=>`<strong>${p}</strong>`).join(' · '):'None captured';
+  bc.innerHTML = `
+    <div class="out-card-header">
+      <div class="out-card-title"><div class="out-card-icon" style="background:rgba(26,74,107,0.1)">◻</div>Space Brief Summary</div>
+    </div>
+    <div class="out-card-body">
+      <div class="brief-grid">${briefItems}</div>
+      <div class="brief-notes">
+        <div style="margin-bottom:7px"><span style="font-family:'Syne Mono',monospace;font-size:9px;color:var(--muted);text-transform:uppercase;letter-spacing:0.08em">Pain Points · </span>${painStr}</div>
+        <div style="margin-bottom:7px"><span style="font-family:'Syne Mono',monospace;font-size:9px;color:var(--muted);text-transform:uppercase;letter-spacing:0.08em">Priorities · </span><strong>${d.priority.join(' · ')||'—'}</strong></div>
+        ${d.notes?`<div><span style="font-family:'Syne Mono',monospace;font-size:9px;color:var(--muted);text-transform:uppercase;letter-spacing:0.08em">Notes · </span>${d.notes}</div>`:''}
+      </div>
+    </div>
+  `;
+  grid.appendChild(bc);
+
+  // ── BENCHMARK CARD ──
+  if(selectedCountry && d.sector) {
+    const bench = d.countryData.benchmarks;
+    const bmCard = document.createElement('div');
+    bmCard.className = 'out-card';
+    const rows = [
+      {label:'Collaboration Zone', client:zones.collab, market:bench.collab, unit:'%'},
+      {label:'Focus / Quiet Zone', client:zones.focus, market:bench.focus, unit:'%'},
+      {label:'Meeting Rooms', client:zones.meeting, market:bench.meeting, unit:'%'},
+      {label:'Space Density', client:d.countryData.density, market:d.countryData.density, unit:' sqft/pax'},
+    ].map(row=>{
+      const max=Math.max(row.client,row.market,55);
+      const cp=Math.round((row.client/max)*90);
+      const mp=Math.round((row.market/max)*90);
+      const diff=row.client-row.market;
+      let tag,cls;
+      if(Math.abs(diff)<=3){tag='Aligned';cls='align';}
+      else if(diff>0){tag='+'+Math.abs(diff)+row.unit;cls='above';}
+      else{tag='-'+Math.abs(diff)+row.unit;cls='below';}
+      return `<div class="bench-row">
+        <div class="bench-label">${row.label}</div>
+        <div class="bench-track">
+          <div class="bench-fill" style="width:${mp}%;background:var(--border2)"></div>
+          <div class="bench-client-marker" style="left:${cp}%"></div>
+        </div>
+        <div class="bench-vals"><span style="color:var(--accent2)">${row.client}${row.unit}</span><span style="color:var(--muted)"> vs ${row.market}${row.unit}</span></div>
+        <span class="bench-tag ${cls}">${tag}</span>
+      </div>`;
+    }).join('');
+    bmCard.innerHTML = `
+      <div class="out-card-header">
+        <div class="out-card-title"><div class="out-card-icon" style="background:rgba(26,92,56,0.1)">◑</div>Benchmark vs ${d.countryData.name} Norm</div>
+        <div style="font-family:'Syne Mono',monospace;font-size:10px;color:var(--muted)"><span style="color:var(--accent2)">|</span> Client &nbsp;<span style="color:var(--muted2)">▬</span> Country avg</div>
+      </div>
+      <div class="out-card-body">${rows}</div>
+    `;
+    grid.appendChild(bmCard);
+  }
+}
+
+function copyBrief() {
+  const d = getData();
+  const zones = calcZones(d);
+  const sqft = calcSqft(d);
+  const text = `APAC SPACE BRIEF
+Country: ${d.countryData?.name||'—'} | Sector: ${d.sector} | Scale: ${d.scale}
+Company: ${d.company} | Headcount: ${d.headcount} → ${d.headcount3y}
+Work Model: ${d.workModel.join(', ')}
+Zone Split: Collab ${zones.collab}% / Focus ${zones.focus}% / Meeting ${zones.meeting}%
+Recommended sqft: ~${sqft.toLocaleString()}
+Budget Signal: ${d.budget} USD/sqft
+Timeline: ${d.timeline.join(', ')}
+Pain Points: ${d.pains.join(', ')}
+Priority: ${d.priority.join(', ')}
+Notes: ${d.notes}`;
+  navigator.clipboard.writeText(text).then(()=>{
+    const btn = event.target;
+    btn.textContent='✓ Copied';
+    setTimeout(()=>btn.textContent='⎘ Copy Brief',2000);
+  });
+}
+
+// ── INIT ──────────────────────────────────────────────────────────────────
+updateNav();
+</script>
+</body>
+</html>
